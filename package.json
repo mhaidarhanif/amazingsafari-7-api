@@ -17,7 +17,9 @@
     "seed": "bun prisma/seed.ts"
   },
   "dependencies": {
+    "@hono/zod-openapi": "^0.19.2",
     "@prisma/client": "6.5.0",
+    "@scalar/hono-api-reference": "^0.8.0",
     "@types/node": "^22.13.10",
     "hono": "^4.7.5",
     "prisma": "^6.5.0",
