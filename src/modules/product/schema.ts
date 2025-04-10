@@ -12,3 +12,13 @@ export const ProductSchema = z.object({
 });
 
 export const ProductsSchema = z.array(ProductSchema);
+
+export const CreateProductSchema = ProductSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  slug: z.string().optional(),
+});
+
+export const CreateProductsSchema = z.array(CreateProductSchema);

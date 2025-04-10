@@ -4,30 +4,14 @@ import { Scalar } from "@scalar/hono-api-reference";
 
 import { prisma } from "./lib/prisma";
 import { ProductsSchema } from "./modules/product/schema";
+import { productsRoute } from "./routes/products";
 
 const app = new OpenAPIHono();
 
 app.use(cors());
 
-app.openapi(
-  createRoute({
-    method: "get",
-    path: "/products",
-    responses: {
-      200: {
-        content: { "application/json": { schema: ProductsSchema } },
-        description: "Get all products",
-      },
-    },
-  }),
-  async (c) => {
-    const products = await prisma.product.findMany();
+app.route("/products", productsRoute);
 
-    return c.json(products);
-  }
-);
-
-// The OpenAPI documentation
 app.doc("/openapi.json", {
   openapi: "3.0.0",
   info: {
