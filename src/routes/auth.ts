@@ -1,14 +1,15 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { prisma } from "../lib/prisma";
-import { z } from "@hono/zod-openapi";
 import {
   LoginResponseSchema,
   LoginUserSchema,
   RegisterUserSchema,
-  UserSchema,
+  PublicUserSchema,
+  PrivateUserSchema,
 } from "../modules/user/schema";
 import { hashPassword, verifyPassword } from "../lib/password";
 import { generateToken } from "../lib/token";
+import { checkAuthorized } from "../modules/auth/middleware";
 
 export const authRoute = new OpenAPIHono();
 
@@ -22,7 +23,7 @@ authRoute.openapi(
     },
     responses: {
       200: {
-        content: { "application/json": { schema: UserSchema } },
+        content: { "application/json": { schema: PublicUserSchema } },
         description: "Successfully registered",
       },
     },
@@ -84,5 +85,24 @@ authRoute.openapi(
     return c.json({
       token,
     });
+  }
+);
+
+// POST /auth/me
+authRoute.openapi(
+  createRoute({
+    method: "get",
+    path: "/me",
+    middleware: checkAuthorized,
+    responses: {
+      200: {
+        content: { "application/json": { schema: PrivateUserSchema } },
+        description: "Get user info",
+      },
+    },
+  }),
+  async (c) => {
+    const user = c.get("user");
+    return c.json(user);
   }
 );
