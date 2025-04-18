@@ -1,16 +1,15 @@
-import { cors } from "hono/cors";
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-
-import { prisma } from "./lib/prisma";
-import { ProductsSchema } from "./modules/product/schema";
+import { cors } from "hono/cors";
 import { productsRoute } from "./routes/products";
+import { usersRoute } from "./routes/users";
 
 const app = new OpenAPIHono();
 
 app.use(cors());
 
 app.route("/products", productsRoute);
+app.route("/users", usersRoute);
 
 app.doc("/openapi.json", {
   openapi: "3.0.0",
