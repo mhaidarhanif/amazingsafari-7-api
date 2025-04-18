@@ -8,6 +8,7 @@ import {
   UserSchema,
 } from "../modules/user/schema";
 import { hashPassword, verifyPassword } from "../lib/password";
+import { generateToken } from "../lib/token";
 
 export const authRoute = new OpenAPIHono();
 
@@ -78,8 +79,10 @@ authRoute.openapi(
       return c.json({ message: "Invalid password" }, 400);
     }
 
+    const token = generateToken(user.id);
+
     return c.json({
-      token: "",
+      token,
     });
   }
 );
