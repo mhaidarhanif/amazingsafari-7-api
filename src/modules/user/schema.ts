@@ -9,9 +9,7 @@ export const PrivateUserSchema = z.object({
 
 export type PrivateUser = z.infer<typeof PrivateUserSchema>;
 
-export const PublicUserSchema = PrivateUserSchema.omit({
-  email: true,
-});
+export const PublicUserSchema = PrivateUserSchema;
 
 export const PublicUsersSchema = z.array(PublicUserSchema);
 

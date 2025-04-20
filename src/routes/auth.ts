@@ -26,20 +26,28 @@ authRoute.openapi(
         content: { "application/json": { schema: PublicUserSchema } },
         description: "Successfully registered",
       },
+      400: {
+        description: "Failed to register user",
+      },
     },
   }),
   async (c) => {
-    const body = c.req.valid("json");
+    try {
+      const body = c.req.valid("json");
 
-    const user = await prisma.user.create({
-      data: {
-        email: body.email,
-        password: { create: { hash: await hashPassword(body.password) } },
-      },
-      omit: { email: true },
-    });
+      const user = await prisma.user.create({
+        data: {
+          email: body.email,
+          password: { create: { hash: await hashPassword(body.password) } },
+        },
+        omit: { email: true },
+      });
 
-    return c.json(user);
+      return c.json(user);
+    } catch (error) {
+      console.error(error);
+      return c.json({ message: "Failed to register user", error }, 400);
+    }
   }
 );
 
@@ -56,35 +64,40 @@ authRoute.openapi(
         content: { "application/json": { schema: LoginResponseSchema } },
         description: "Successfully logged in",
       },
-      404: {
+      400: {
         description: "Failed to login",
       },
     },
   }),
   async (c) => {
-    const body = c.req.valid("json");
+    try {
+      const body = c.req.valid("json");
 
-    const user = await prisma.user.findUnique({
-      where: { email: body.email },
-      include: { password: true },
-    });
-    if (!user) {
-      return c.json({ message: "User not found" }, 400);
+      const user = await prisma.user.findUnique({
+        where: { email: body.email },
+        include: { password: true },
+      });
+      if (!user) {
+        return c.json({ message: "User not found" }, 400);
+      }
+      if (!user.password?.hash) {
+        return c.json({ message: "User does not have a password" }, 400);
+      }
+
+      const isValid = await verifyPassword(user.password.hash, body.password);
+      if (!isValid) {
+        return c.json({ message: "Invalid password" }, 400);
+      }
+
+      const token = generateToken(user.id);
+
+      return c.json({
+        token,
+      });
+    } catch (error) {
+      console.error(error);
+      return c.json({ message: "Failed to login user", error }, 400);
     }
-    if (!user.password?.hash) {
-      return c.json({ message: "User does not have a password" }, 400);
-    }
-
-    const isValid = await verifyPassword(user.password.hash, body.password);
-    if (!isValid) {
-      return c.json({ message: "Invalid password" }, 400);
-    }
-
-    const token = generateToken(user.id);
-
-    return c.json({
-      token,
-    });
   }
 );
 
