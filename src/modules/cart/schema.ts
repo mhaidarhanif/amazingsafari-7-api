@@ -37,4 +37,9 @@ export const CartSchema = z.object({
   updatedAt: z.date(),
 });
 
+export const AddCartItemSchema = z.object({
+  productId: z.string(),
+  quantity: z.number().default(1),
+});
+
 export type Cart = z.infer<typeof CartSchema>;
