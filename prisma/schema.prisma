@@ -14,6 +14,8 @@ model User {
 
   password Password?
 
+  carts Cart[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -30,6 +32,36 @@ model Password {
   updatedAt DateTime @updatedAt
 }
 
+model Cart {
+  id String @id @default(ulid())
+
+  items CartItem[]
+
+  user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId String
+
+  // totalQuantity Int
+  // totalPrice    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id String @id @default(ulid())
+
+  quantity Int
+
+  product   Product @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productId String
+
+  cart   Cart   @relation(fields: [cartId], references: [id])
+  cartId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Product {
   id String @id @default(ulid())
 
@@ -40,6 +72,8 @@ model Product {
   imageUrl String
 
   price Int
+
+  cartItems CartItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
