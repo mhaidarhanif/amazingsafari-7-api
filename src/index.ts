@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { productsRoute } from "./routes/products";
 import { usersRoute } from "./routes/users";
 import { authRoute } from "./routes/auth";
+import { cartRoute } from "./routes/cart";
 
 const app = new OpenAPIHono();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.route("/products", productsRoute);
 app.route("/users", usersRoute);
 app.route("/auth", authRoute);
+app.route("/cart", cartRoute);
 
 app.doc("/openapi.json", {
   openapi: "3.0.0",
